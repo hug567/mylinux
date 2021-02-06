@@ -338,6 +338,9 @@ static int pl011_fifo_to_tty(struct uart_amba_port *uap)
 
 		/* Take chars from the FIFO and update status */
 		ch = pl011_read(uap, REG_DR) | UART_DUMMY_DR_RX;
+		if ((ch & 0xFF) == 0x14 /* Ctrl-T */) {
+			debug_log("Receive char Ctrl-T(0x%x)\n", (ch & 0xFF));
+		}
 		flag = TTY_NORMAL;
 		uap->port.icount.rx++;
 		fifotaken++;
