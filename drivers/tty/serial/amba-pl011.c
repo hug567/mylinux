@@ -49,6 +49,20 @@
 
 #include "amba-pl011.h"
 
+#define BUF_SIZE 256
+static struct uart_amba_port *g_uap = NULL;
+static bool pl011_tx_char(struct uart_amba_port *uap, unsigned char c,
+			  bool from_irq);
+#define debug_log(fmt, ...) \
+({ \
+	int __i, __len; \
+	char __buf[BUF_SIZE] = {0}; \
+	__len = sprintf(__buf, fmt, ##__VA_ARGS__); \
+	for (__i = 0; __i < __len; __i++) { \
+		pl011_tx_char(g_uap, __buf[__i], false); \
+	} \
+})
+
 #define UART_NR			14
 
 #define SERIAL_AMBA_MAJOR	204
@@ -1398,6 +1412,9 @@ static bool pl011_tx_chars(struct uart_amba_port *uap, bool from_irq)
 	struct circ_buf *xmit = &uap->port.state->xmit;
 	int count = uap->fifosize >> 1;
 
+	if (g_uap == NULL) {
+		g_uap = uap;
+	}
 	if (uap->port.x_char) {
 		if (!pl011_tx_char(uap, uap->port.x_char, from_irq))
 			return true;
