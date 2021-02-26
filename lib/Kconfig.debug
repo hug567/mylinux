@@ -2,7 +2,8 @@ menu "printk and dmesg options"
 
 config PRINTK_TIME
 	bool "Show timing information on printks"
-	depends on PRINTK
+	#depends on PRINTK
+	default y
 	help
 	  Selecting this option causes time stamps of the printk()
 	  messages to be added to the output of the syslog() system
